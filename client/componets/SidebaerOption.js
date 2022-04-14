@@ -11,11 +11,15 @@ const style = {
 }
 
 function SidebarOption({ text, Icon, isActive, setSelected, redirect }) {
+  const router = useRouter()
     return (
         <div 
         className={style.wrapper}
         onClick={() => {
             setSelected(text)
+            if (redirect) {
+              router.push(redirect)
+            } else return
         }}
     >
        <div className={style.iconContainer}>

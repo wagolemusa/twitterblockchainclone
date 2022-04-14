@@ -136,6 +136,8 @@ function Sidebar({ initialSelectedIcon }) {
       >
         <ProfileImageMinter />
       </Modal> */}
+
+
     </div>
   )
 }
