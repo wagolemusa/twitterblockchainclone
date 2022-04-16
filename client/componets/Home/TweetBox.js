@@ -1,9 +1,11 @@
-import React, {useState } from 'react'
+
+import { useState, useContext } from 'react'
+import { TwitterContext } from '../../context/TweetContents'
 import { BsCardImage, BsEmojiSmile } from 'react-icons/bs'
 import { RiFileGifLine, RiBarChartHorizontalFill } from 'react-icons/ri'
 import { IoMdCalendar } from 'react-icons/io'
 import { MdOutlineLocationOn } from 'react-icons/md'
-
+import { client } from '../../lib/client'
 
 const style = {
     wrapper: `px-4 flex flex-row border-b border-[#38444d] pb-4`,
@@ -18,19 +20,53 @@ const style = {
     inactiveSubmit: `bg-[#196195] text-[#95999e]`,
     activeSubmit: `bg-[#1d9bf0] text-white`,
   }
+
 const TweetBox = () => {
 
     const [ tweetMessage, setTweetMessage ] = useState('')
+    const { currentAccount, currentUser, tweets } = useContext(TwitterContext)
 
-    const postTweet = (e) => {
+    const postTweet = async (e) => {
         e.preventDefault(e)
-        console.log(tweetMessage)
+        if(!tweetMessage) return
+
+        const tweetId = `${currentAccount}_${Date.now()}`
+
+        const tweeDoc = {
+            _type: 'tweets',
+            _id: tweetId,
+            tweet: tweetMessage,
+            timestamp: new Date(Date.now()).toISOString(),
+            author: {
+                _key: tweetId,
+                _type: 'reference',
+                _ref: currentAccount,
+            },
+        }
+        await client.createIfNotExists(tweeDoc)
+
+        await client 
+            .patch(currentAccount)
+            .setIfMissing({ tweets: [] })
+            .insert('after', 'tweets[-1]', [
+                {
+                    _key: tweetId,
+                    _type: 'reference',
+                    _ref: tweetId,
+                },
+            ])
+            .commit()
+        setTweetMessage('')
     }
+
     return(
         <div className={style.wrapper}>
             <div className={style.tweetBoxLeft}>
-                <img src='https://avatars.githubusercontent.com/u/11345727?v=4' alt="profile image"
-                className={style.profileImage}
+                <img src={currentUser.profileImage} alt="profile image"
+                className={
+                    currentUser.isProfileImageNft 
+                    ? `${style.profileImage} smallHex`
+                    :style.profileImage }
                 />
             </div>
 
