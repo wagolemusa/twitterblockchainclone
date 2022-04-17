@@ -9,8 +9,8 @@ import errorImg from '../assets/error.png'
 import Image from 'next/image'
 
 const style = {
-  wrapper: `flex justify-center h-screen w-screen select-none bg-[#15202b] text-white`,
-  content: `max-w-[1400px] w-2/3 flex justify-between`
+  wrapper: `flex justify-center  w-screen select-none bg-[#15202b] text-white`,
+  content: `flex justify-between`
 
 }
 
